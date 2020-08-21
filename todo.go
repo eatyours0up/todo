@@ -19,7 +19,7 @@ func main() {
 	// configure the root command
 	commando.
 		Register(nil).
-		AddArgument("name", "name of the todo list", "todo.txt").
+		AddArgument("name", "name of the todo list", "todo").
 		AddFlag("tasks,t", "comma separated list of tasks", commando.String, ""). // default ``
 		AddFlag("location,l", "location to create file", commando.String, "./").  // default `./`
 		SetAction(func(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
@@ -29,30 +29,11 @@ func main() {
 			location, _ := flags["location"].GetString()
 			//split `tasks` into slice
 			tasks := strings.Split(tasksStr, ",")
-			// fmt.Println(name)
-			// fmt.Printf("%v\n", tasks)
-			// fmt.Println(location)
-
-			// fileName := name
-			// //check if `name` contains `.txt`, if not append
-			// if !strings.Contains(fileName, ".txt") {
-			// 	fileName = fileName + ".txt"
-			// }
 			//check if `location` ends in `/` if not append
 			if !strings.HasSuffix(location, "/") {
 				location = location + "/"
 			}
 			createTodo(name, tasks, location)
-
-			// // print arguments
-			// for k, v := range args {
-			// 	fmt.Printf("arg -> %v: %v(%T)\n", k, v.Value, v.Value)
-			// }
-
-			// // print flags
-			// for k, v := range flags {
-			// 	fmt.Printf("flag -> %v: %v(%T)\n", k, v.Value, v.Value)
-			// }
 
 		})
 
