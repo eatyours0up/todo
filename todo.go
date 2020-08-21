@@ -70,7 +70,7 @@ func createTodo(name string, tasks []string, location string) {
 		}
 		f.WriteString("✅✅ " + name + " ✅✅\n\n")
 		for _, task := range tasks {
-			f.WriteString("[ ] " + task + "\n")
+			f.WriteString("[ ] " + strings.TrimSpace(task) + "\n")
 		}
 	} else {
 		f, err := os.Create(location + name)
@@ -80,7 +80,7 @@ func createTodo(name string, tasks []string, location string) {
 		}
 		f.WriteString(name + "\n\n")
 		for _, task := range tasks {
-			f.WriteString("[ ] " + task + "\n")
+			f.WriteString("[ ] " + strings.TrimSpace(task) + "\n")
 		}
 	}
 
