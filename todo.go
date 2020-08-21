@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/thatisuday/commando"
@@ -14,7 +15,7 @@ func main() {
 	commando.
 		SetExecutableName("todo").
 		SetVersion("1.0.0").
-		SetDescription("This tool lets you create a simple todo list.")
+		SetDescription("This tool lets you create a simple todo list. Opens using `code` so make sure you have that set up 😉")
 
 	// configure the root command
 	commando.
@@ -23,7 +24,6 @@ func main() {
 		AddFlag("tasks,t", "comma separated list of tasks", commando.String, ""). // default ``
 		AddFlag("location,l", "location to create file", commando.String, "./").  // default `./`
 		SetAction(func(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
-			fmt.Printf("Printing options of the `root` command...\n\n")
 			name := args["name"].Value
 			tasksStr, _ := flags["tasks"].GetString()
 			location, _ := flags["location"].GetString()
@@ -34,7 +34,7 @@ func main() {
 				location = location + "/"
 			}
 			createTodo(name, tasks, location)
-
+			openTodoInVSCode(name)
 		})
 
 	// configure info command
@@ -45,8 +45,6 @@ func main() {
 		AddFlag("tasks,t", "comma separated list of tasks", commando.String, nil).
 		AddFlag("location,l", "location to create file", commando.String, "./").
 		SetAction(func(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
-			fmt.Printf("Printing options of the `info` command...\n\n")
-
 			// print arguments
 			for k, v := range args {
 				fmt.Printf("arg -> %v: %v(%T)\n", k, v.Value, v.Value)
@@ -70,7 +68,7 @@ func createTodo(name string, tasks []string, location string) {
 			fmt.Println(err)
 			return
 		}
-		f.WriteString(name + "\n\n")
+		f.WriteString("✅✅ " + name + " ✅✅\n\n")
 		for _, task := range tasks {
 			f.WriteString("[ ] " + task + "\n")
 		}
@@ -86,4 +84,12 @@ func createTodo(name string, tasks []string, location string) {
 		}
 	}
 
+}
+
+func openTodoInVSCode(name string) {
+	if !strings.Contains(name, ".txt") {
+		exec.Command("code", name+".txt").Output()
+	} else {
+		exec.Command("code", name).Output()
+	}
 }
