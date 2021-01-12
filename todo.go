@@ -24,11 +24,13 @@ func main() {
 		AddFlag("tasks,t", "comma separated list of tasks", commando.String, nil). // default ``
 		AddFlag("sub-tasks,s", "a comma separated list of sub-tasks for a task, can only be used on a single task", commando.String, "nil").
 		AddFlag("location,l", "location to create file", commando.String, "./"). // default `./`
+		AddFlag("open,o", "open file in vscode", commando.Bool, nil).
 		SetAction(func(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
 			name := args["name"].Value
 			tasksStr, _ := flags["tasks"].GetString()
 			subTaskStr, _ := flags["sub-tasks"].GetString()
 			location, _ := flags["location"].GetString()
+			open, _ := flags["open"].GetBool()
 			//split `tasks` into slice
 			tasks := strings.Split(tasksStr, ",")
 			subTasks := strings.Split(subTaskStr, ",")
@@ -37,7 +39,9 @@ func main() {
 				location = location + "/"
 			}
 			createTodo(&name, &tasks, &subTasks, &location)
-			// openTodoInVSCode(name)
+			if open {
+				openTodoInVSCode(name)
+			}
 		})
 
 	// configure info command
@@ -48,6 +52,7 @@ func main() {
 		AddFlag("tasks,t", "comma separated list of tasks", commando.String, nil).
 		AddFlag("sub-tasks,s", "a comma separated list of sub-tasks for a task, can only be used on a single task", commando.String, "nil").
 		AddFlag("location,l", "location to create file", commando.String, "./").
+		AddFlag("open,o", "open file in vscode", commando.Bool, nil).
 		SetAction(func(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
 			// print arguments
 			for k, v := range args {
@@ -68,6 +73,7 @@ func main() {
 func createTodo(name *string, tasks *[]string, subTasks *[]string, location *string) {
 	removeEmpty(tasks)
 	removeEmpty(subTasks)
+	removeIfEquals(subTasks, "nil")
 
 	n := *name
 	t := *tasks
@@ -124,6 +130,19 @@ func removeEmpty(slice *[]string) {
 	p := *slice
 	for _, entry := range p {
 		if strings.Trim(entry, " ") != "" {
+			p[i] = entry
+			i++
+		}
+	}
+	*slice = p[0:i]
+}
+
+//because I cant figure out exactly how this commando lib works, remove 'nil' from the
+func removeIfEquals(slice *[]string, match string) {
+	i := 0
+	p := *slice
+	for _, entry := range p {
+		if strings.TrimSpace(entry) != strings.TrimSpace(match) {
 			p[i] = entry
 			i++
 		}
